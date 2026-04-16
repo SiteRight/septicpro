@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F172A">
+<title>SepticPro v20</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0F172A;--bg2:#1E293B;--bg3:#334155;
+  --card:#1E293B;--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);
+  --text:#F1F5F9;--text2:#94A3B8;--text3:#64748B;
+  --blue:#3B82F6;--green:#22C55E;--amber:#F59E0B;--red:#EF4444;--purple:#8B5CF6;
+  --r:14px;--rs:8px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;}
+.screen{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;}
+
+/* LOGIN */
+.login-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:20px;background:var(--bg);}
+.login-logo{width:72px;height:72px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);border-radius:20px;display:flex;align-items:center;justify-content:center;}
+.login-card{width:100%;max-width:380px;background:var(--card);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:16px;border:1px solid var(--border);}
+.login-title{font-size:26px;font-weight:800;text-align:center;}
+.login-sub{font-size:13px;color:var(--text2);text-align:center;margin-top:-12px;}
+.login-version{font-size:11px;color:var(--text3);text-align:center;margin-top:-8px;}
+.role-row{display:flex;gap:8px;}
+.rb{flex:1;padding:12px;border-radius:12px;border:2px solid var(--border2);background:transparent;color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;}
+.rb.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+.pw-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;font-size:16px;color:var(--text);outline:none;-webkit-appearance:none;}
+.pw-input:focus{border-color:var(--blue);}
+.login-btn{width:100%;padding:16px;background:var(--blue);border-radius:12px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;text-align:center;border:none;}
+.login-btn:active{opacity:.8;}
+.login-err{font-size:13px;color:var(--red);text-align:center;min-height:20px;}
+
+/* NAV */
+#nav{display:none;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;}
+.nav-inner{display:flex;justify-content:space-around;padding:6px 0 max(6px,env(safe-area-inset-bottom));}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 12px;border-radius:10px;cursor:pointer;color:var(--text3);font-size:10px;min-width:56px;}
+.ni svg{width:22px;height:22px;}
+.ni.on{color:var(--blue);}
+
+/* HEADER */
+.hdr{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.hdr h1{font-size:22px;font-weight:800;}
+.hdr-sub{font-size:12px;color:var(--text2);}
+
+/* SCROLL CONTENT */
+.scroll{flex:1;overflow-y:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--r);border:.5px solid var(--border);padding:14px;margin-bottom:10px;}
+.card-title{font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text);}
+
+/* METRIC TILES */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.metric{background:var(--card);border-radius:var(--r);border:.5px solid var(--border);padding:14px;}
+.metric-val{font-size:28px;font-weight:800;color:var(--text);}
+.metric-lbl{font-size:11px;color:var(--text2);margin-top:2px;}
+
+/* LIST ROWS */
+.lr{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:.5px solid var(--border);cursor:pointer;}
+.lr:last-child{border-bottom:none;}
+.ri{flex:1;min-width:0;}
+.rn{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rs{font-size:11px;color:var(--text2);margin-top:1px;}
+.av{width:38px;height:38px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+.b-green{background:rgba(34,197,94,.15);color:#4ADE80;}
+.b-blue{background:rgba(59,130,246,.15);color:#60A5FA;}
+.b-amber{background:rgba(245,158,11,.15);color:#FCD34D;}
+.b-gray{background:rgba(100,116,139,.2);color:#94A3B8;}
+.b-red{background:rgba(239,68,68,.15);color:#F87171;}
+
+/* SECTION LABEL */
+.sl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:14px 0 8px;}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.fl{font-size:12px;color:var(--text2);font-weight:600;}
+.fi{background:var(--bg3);border:.5px solid var(--border2);border-radius:10px;padding:11px 12px;font-size:15px;color:var(--text);outline:none;width:100%;-webkit-appearance:none;}
+.fi:focus{border-color:var(--blue);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* BUTTONS */
+.btn{padding:11px 16px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;text-align:center;border:none;}
+.btn-b{background:var(--blue);color:#fff;}
+.btn-g{background:var(--bg3);color:var(--text);border:.5px solid var(--border2);}
+.btn-r{background:rgba(239,68,68,.15);color:#F87171;border:.5px solid rgba(239,68,68,.3);}
+.btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+
+/* SLIDE PANELS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;}
+.overlay.open{display:block;}
+.slide{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-radius:20px 20px 0 0;z-index:101;transform:translateY(100%);transition:transform .3s ease;max-height:90vh;overflow-y:auto;padding:0 16px 32px;}
+.slide.open{transform:translateY(0);}
+.slide-handle{width:36px;height:4px;background:var(--bg3);border-radius:2px;margin:12px auto 16px;}
+.slide-title{font-size:18px;font-weight:800;margin-bottom:16px;}
+
+/* ESTIMATE SPECIFIC */
+.est-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.et{flex:1;padding:9px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;background:var(--bg3);color:var(--text2);border:none;}
+.et.on{background:var(--blue);color:#fff;}
+.er{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--border);}
+.er:last-child{border-bottom:none;}
+.er-l{font-size:13px;color:var(--text2);}
+.er-v{font-size:14px;font-weight:700;}
+.er-u{font-size:11px;color:var(--text3);margin-top:1px;}
+.er-p{font-size:13px;color:var(--green);font-weight:600;}
+.tc{background:var(--blue);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:12px;}
+.tc-l{font-size:13px;color:rgba(255,255,255,.75);}
+.tc-v{font-size:22px;font-weight:800;color:#fff;}
+
+/* QUOTE LINE */
+.ql{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);}
+.ql:last-child{border-bottom:none;}
+.ql-l{font-size:13px;font-weight:600;}
+.ql-d{font-size:11px;color:var(--text2);margin-top:2px;}
+.ql-p{font-size:14px;font-weight:700;color:var(--green);}
+
+/* MAP */
+#mapWrap{flex:1;position:relative;}
+#leafMap{width:100%;height:100%;}
+.map-hdr{padding:10px 16px;background:var(--bg2);border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.cap-info{flex:1;}
+.cap-title{font-size:14px;font-weight:700;}
+.cap-sub{font-size:11px;color:var(--text2);}
+.cap-btn{padding:8px 14px;background:var(--blue);border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;border:none;white-space:nowrap;}
+.map-layers{position:absolute;top:10px;right:10px;background:var(--bg2);border-radius:12px;border:.5px solid var(--border);overflow:hidden;z-index:500;max-width:160px;}
+.ml-row{display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;border-bottom:.5px solid var(--border);font-size:12px;}
+.ml-row:last-child{border-bottom:none;}
+.ml-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* PROFILE TABS */
+.ptabs{display:flex;overflow-x:auto;gap:6px;padding:0 16px 10px;flex-shrink:0;scrollbar-width:none;}
+.ptabs::-webkit-scrollbar{display:none;}
+.pt{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--bg3);color:var(--text2);border:none;}
+.pt.on{background:var(--blue);color:#fff;}
+
+/* DATA TABLE */
+.dt{background:var(--card);border-radius:var(--r);border:.5px solid var(--border);overflow:hidden;margin-bottom:10px;}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:.5px solid var(--border);}
+.dr:last-child{border-bottom:none;}
+.dk{font-size:12px;color:var(--text2);}
+.dv{font-size:13px;font-weight:600;}
+
+/* PHOTO GRID */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.photo-thumb{aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.ph-del{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;line-height:1;}
+.photo-add{aspect-ratio:1;border-radius:10px;background:var(--bg3);border:1.5px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;}
+.photo-add-icon{font-size:22px;color:var(--text3);}
+.photo-add-lbl{font-size:10px;color:var(--text3);}
+
+/* SETBACK BOX */
+.sb-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;margin-bottom:12px;}
+.sb-title{font-size:12px;font-weight:700;color:#F87171;margin-bottom:8px;}
+.sb-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.sb-item{background:rgba(0,0,0,.2);border-radius:8px;padding:8px;text-align:center;}
+.sb-num{font-size:16px;font-weight:800;color:#F87171;}
+.sb-lbl{font-size:10px;color:var(--text2);margin-top:2px;}
+
+/* DELETE BTN inline */
+.del-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.12);color:#F87171;border:.5px solid rgba(239,68,68,.3);}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- LOGIN -->
+<div id="scrLogin" class="screen active">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <svg width="38" height="38" fill="white" viewBox="0 0 40 40"><path d="M20 4L8 10v12c0 7.2 5.2 13.9 12 15.5C27.8 35.9 32 29.2 32 22V10L20 4z"/></svg>
+    </div>
+    <div class="login-title">SepticPro</div>
+    <div class="login-sub">Site Right Excavation L.L.C.</div>
+    <div class="login-version">v20</div>
+    <div class="login-card">
+      <div>
+        <div class="fl" style="margin-bottom:8px;">Sign in as</div>
+        <div class="role-row">
+          <div class="rb on" id="rbAdmin" onclick="setRole('admin')">Admin</div>
+          <div class="rb" id="rbEmp" onclick="setRole('employee')">Employee</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl" style="margin-bottom:8px;">Password</div>
+        <input class="pw-input" id="pwInput" type="password" placeholder="Enter password"
+          onkeydown="if(event.key==='Enter')doLogin();">
+      </div>
+      <div class="login-btn" onclick="doLogin()">Sign In</div>
+      <div class="login-err" id="loginErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="scrDash" class="screen">
+  <div class="hdr"><div><h1 id="greeting">Good morning, Phil</h1><div class="hdr-sub">Site Right Excavation</div></div></div>
+  <div class="scroll">
+    <div class="metrics">
+      <div class="metric"><div class="metric-val" id="mComp">0</div><div class="metric-lbl">Completed</div></div>
+      <div class="metric"><div class="metric-val" id="mSched">0</div><div class="metric-lbl">Scheduled</div></div>
+      <div class="metric"><div class="metric-val" id="mPart">0</div><div class="metric-lbl">In Progress</div></div>
+      <div class="metric"><div class="metric-val" id="mTotal">0</div><div class="metric-lbl">Total Jobs</div></div>
+    </div>
+    <div class="sl">Upcoming jobs</div>
+    <div class="card" id="dashJobs"></div>
+    <div class="btn btn-b" style="width:100%;margin-top:4px;" onclick="go('Custs')">View all customers</div>
+  </div>
+</div>
+
+<!-- CUSTOMERS -->
+<div id="scrCusts" class="screen">
+  <div class="hdr">
+    <div><h1>Customers</h1></div>
+    <div class="btn btn-b" style="padding:9px 14px;font-size:13px;" onclick="openSlide('slideNewCust')">+ New</div>
+  </div>
+  <div class="scroll" id="custList"></div>
+</div>
+
+<!-- PROFILE -->
+<div id="scrProfile" class="screen">
+  <div class="hdr">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div onclick="go('Custs')" style="cursor:pointer;color:var(--blue);font-size:20px;">‹</div>
+      <div>
+        <h1 id="profName">Customer</h1>
+        <div class="hdr-sub" id="profSub"></div>
+      </div>
+    </div>
+    <div class="del-btn" id="profDelBtn" onclick="">Delete</div>
+  </div>
+  <div class="ptabs" id="profTabs"></div>
+  <div class="scroll" id="profContent"></div>
+</div>
+
+<!-- ESTIMATOR -->
+<div id="scrEst" class="screen">
+  <div class="hdr"><h1>Estimator</h1></div>
+  <div class="scroll">
+
+    <div class="sl">Field dimensions</div>
+    <div class="card">
+      <div class="fr">
+        <div class="fg"><div class="fl">Field length (ft)</div><input class="fi" id="eFl" type="number" value="56" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Field width (ft)</div><input class="fi" id="eFw" type="number" value="16" inputmode="decimal"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><div class="fl">Laterals</div><input class="fi" id="eLat" type="number" value="4" inputmode="numeric"></div>
+        <div class="fg"><div class="fl">Pipe diameter</div>
+          <select class="fi" id="ePipeDia"><option value="4">4"</option><option value="3">3"</option></select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><div class="fl">Min extension (ft)</div><input class="fi" id="eExt" type="number" value="5" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Field type</div>
+          <select class="fi" id="eType" onchange="syncSlope()">
+            <option value="gravity">Gravity (conventional)</option>
+            <option value="pressure">Pressure mound</option>
+            <option value="ezflow">EZ Flow</option>
+            <option value="elgin">Elgin pods</option>
+            <option value="chamber">Chamber</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sl">Grade & fill</div>
+    <div class="card">
+      <div class="fr">
+        <div class="fg"><div class="fl">High side fill (in)</div><input class="fi" id="eHigh" type="number" value="24" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Ground drop (in)</div><input class="fi" id="eDrop" type="number" value="0" inputmode="decimal"></div>
+      </div>
+      <div class="fg"><div class="fl">Side slope</div>
+        <select class="fi" id="eSlope">
+          <option value="4">4:1 (conventional default)</option>
+          <option value="3">3:1 (pressure mound default)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sl">Topsoil cover</div>
+    <div class="card">
+      <div class="fg">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="fl">Thickness</div>
+          <div style="font-size:14px;font-weight:700;" id="eTopLbl">6"</div>
+        </div>
+        <input type="range" id="eTopSlider" min="4" max="12" value="6" step="1"
+          oninput="document.getElementById('eTopLbl').textContent=this.value+'&quot;';"
+          style="width:100%;accent-color:var(--blue);">
+        <div style="font-size:11px;color:var(--text3);">4" minimum · 12" maximum</div>
+      </div>
+    </div>
+
+    <div class="sl">Pricing</div>
+    <div class="card">
+      <div class="fr">
+        <div class="fg"><div class="fl">Sand ($/CY)</div><input class="fi" id="ePSand" type="number" value="28" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Stone ($/CY)</div><input class="fi" id="ePStone" type="number" value="45" inputmode="decimal"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><div class="fl">Topsoil ($/CY)</div><input class="fi" id="ePTop" type="number" value="32" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Fabric ($/sq yd)</div><input class="fi" id="ePFab" type="number" value="1.50" inputmode="decimal"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><div class="fl">Solid pipe ($/ft)</div><input class="fi" id="ePSolid" type="number" value="1.20" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Perf pipe ($/ft)</div><input class="fi" id="ePPerf" type="number" value="1.20" inputmode="decimal"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><div class="fl">Elbow (each)</div><input class="fi" id="ePElbow" type="number" value="4.50" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Tee (each)</div><input class="fi" id="ePTee" type="number" value="5.00" inputmode="decimal"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><div class="fl">Sweep 90 (each)</div><input class="fi" id="ePSweep" type="number" value="8.00" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Cap (each)</div><input class="fi" id="ePCap" type="number" value="3.00" inputmode="decimal"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><div class="fl">Obs box (each)</div><input class="fi" id="ePObs" type="number" value="45.00" inputmode="decimal"></div>
+        <div class="fg"><div class="fl">Cleanout (each)</div><input class="fi" id="ePClean" type="number" value="35.00" inputmode="decimal"></div>
+      </div>
+    </div>
+
+    <div class="sl">Truck & delivery</div>
+    <div class="card">
+      <div class="fr">
+        <div class="fg"><div class="fl">Capacity (CY/load)</div><input class="fi" id="eTruckCY" type="number" value="15" inputmode="numeric"></div>
+        <div class="fg"><div class="fl">Round trip (hrs)</div><input class="fi" id="eTruckRT" type="number" value="1" step="0.25" inputmode="decimal"></div>
+      </div>
+      <div class="fg"><div class="fl">Truck rate ($/hr)</div><input class="fi" id="eTruckRate" type="number" value="100" inputmode="decimal"></div>
+    </div>
+
+    <div class="sl">Overhead & job</div>
+    <div class="card">
+      <div class="fr">
+        <div class="fg">
+          <div class="fl">Job duration (days) <span id="eJobHrsLbl" style="color:var(--text3);font-weight:400;">= 16 hrs</span></div>
+          <input class="fi" id="eJobDays" type="number" value="2" min="0.5" step="0.5" inputmode="decimal"
+            oninput="g('eJobHrsLbl').textContent='= '+(+this.value*8)+' hrs';">
+          <div style="font-size:11px;color:var(--text3);">8 hrs/day · overhead scales with it</div>
+        </div>
+        <div class="fg"><div class="fl">Margin</div>
+          <select class="fi" id="eMargin">
+            <option value="0">No margin</option>
+            <option value="0.20" selected>20%</option>
+            <option value="0.25">25%</option>
+            <option value="0.30">30%</option>
+            <option value="0.35">35%</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn btn-b" style="width:100%;margin:4px 0 16px;font-size:15px;padding:14px;" onclick="calcEst()">Calculate estimate</div>
+    <div id="estOut" style="margin-bottom:16px;"></div>
+  </div>
+</div>
+
+<!-- AS-BUILT MAP -->
+<div id="scrMap" class="screen">
+  <div class="map-hdr">
+    <div class="cap-info">
+      <div class="cap-title" id="capTitle">GPS As-Built</div>
+      <div class="cap-sub" id="capSub">Select a layer to capture</div>
+    </div>
+    <div class="cap-btn" onclick="dropPt()">Drop point</div>
+  </div>
+  <div id="mapWrap">
+    <div id="leafMap"></div>
+    <div class="map-layers" id="mapLayers"></div>
+  </div>
+</div>
+
+<!-- JOBS -->
+<div id="scrJobs" class="screen">
+  <div class="hdr">
+    <div><h1>Jobs</h1></div>
+    <div class="btn btn-b" style="padding:9px 14px;font-size:13px;" onclick="openSlide('slideNewCust')">+ New</div>
+  </div>
+  <div class="scroll" id="jobsList"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <div class="ni on" id="ni-dash" onclick="go('Dash')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dash
+    </div>
+    <div class="ni" id="ni-custs" onclick="go('Custs')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M16 3.13a4 4 0 010 7.75"/><path d="M21 21v-2a4 4 0 00-3-3.85"/></svg>
+      Customers
+    </div>
+    <div class="ni" id="ni-est" onclick="go('Est')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-3"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      Estimate
+    </div>
+    <div class="ni" id="ni-map" onclick="go('Map');initMap();">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+      As-Built
+    </div>
+    <div class="ni" id="ni-jobs" onclick="go('Jobs')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Jobs
+    </div>
+  </div>
+</nav>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeAllSlides()"></div>
+
+<!-- NEW CUSTOMER SLIDE -->
+<div class="slide" id="slideNewCust">
+  <div class="slide-handle"></div>
+  <div class="slide-title">New customer</div>
+  <div class="fr">
+    <div class="fg"><div class="fl">First name</div><input class="fi" id="nFirst" type="text"></div>
+    <div class="fg"><div class="fl">Last name</div><input class="fi" id="nLast" type="text"></div>
+  </div>
+  <div class="fg"><div class="fl">Phone</div><input class="fi" id="nPhone" type="tel"></div>
+  <div class="fg"><div class="fl">Address</div><input class="fi" id="nAddr" type="text"></div>
+  <div class="fr">
+    <div class="fg"><div class="fl">City</div><input class="fi" id="nCity" type="text"></div>
+    <div class="fg"><div class="fl">State</div><input class="fi" id="nState" type="text" value="MI"></div>
+  </div>
+  <div class="btn-row">
+    <div class="btn btn-b" style="flex:1;" onclick="saveNewCust()">Save customer</div>
+    <div class="btn btn-g" onclick="closeSlide('slideNewCust')">Cancel</div>
+  </div>
+</div>
+
+<!-- SCHEDULE SLIDE -->
+<div class="slide" id="slideSchedule">
+  <div class="slide-handle"></div>
+  <div class="slide-title">Schedule job</div>
+  <div class="fg"><div class="fl">Date</div><input class="fi" id="sDate" type="date"></div>
+  <div class="fg"><div class="fl">Duration (days)</div>
+    <select class="fi" id="sDur">
+      <option value="0.5">Half day (4 hrs)</option>
+      <option value="1" selected>1 day (8 hrs)</option>
+      <option value="1.5">1.5 days (12 hrs)</option>
+      <option value="2">2 days (16 hrs)</option>
+      <option value="2.5">2.5 days (20 hrs)</option>
+      <option value="3">3 days (24 hrs)</option>
+      <option value="4">4 days (32 hrs)</option>
+      <option value="5">5 days (40 hrs)</option>
+    </select>
+  </div>
+  <div class="fg"><div class="fl">Notes</div><input class="fi" id="sNotes" type="text" placeholder="Optional"></div>
+  <div class="btn-row">
+    <div class="btn btn-b" style="flex:1;" onclick="saveSchedule()">Save</div>
+    <div class="btn btn-g" onclick="closeSlide('slideSchedule')">Cancel</div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── HELPERS ──────────────────────────────────────────────
+function g(id){return document.getElementById(id);}
+function fmt$(n){return '$'+parseFloat(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function fmtD(d){if(!d)return'TBD';var p=d.split('-');return p[1]+'/'+p[2]+'/'+p[0];}
+function cy(f){return Math.round(f/27*10)/10;}
+function rd(n,d){var m=Math.pow(10,d||0);return Math.round(n*m)/m;}
+function toast(msg){
+  var t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1E293B;color:#F1F5F9;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;border:1px solid rgba(255,255,255,0.15);white-space:nowrap;';
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove();},2500);
+}
+
+// ── STATE ────────────────────────────────────────────────
+var ROLE = 'admin';
+var selRole = 'admin';
+var CUST = null;
+var SCHED_CUST = null;
+var leafMap = null;
+var liveMarker = null;
+var activeCap = 0;
+
+// ── SAMPLE DATA ──────────────────────────────────────────
+var CUSTOMERS = [
+  {id:'salmi',fn:'James',ln:'Salmi',co:'Polly Salmi',ph:'906-555-0101',addr:'20329 Worham Rd',city:'Chassell',state:'MI',
+   status:'scheduled',date:'2025-09-15',dur:2,notes:'Permit S25-31-197',
+   fL:56,fW:16,laterals:4,highIn:24,dropIn:0,fieldType:'pressure',
+   photos:[],docs:['Permit S25-31-197.pdf'],partial:[]},
+  {id:'harmon',fn:'Mike',ln:'Harmon',co:'',ph:'906-555-0182',addr:'1204 Pine St',city:'Houghton',state:'MI',
+   status:'scheduled',date:'2025-10-01',dur:1.5,notes:'Dog on property',
+   fL:40,fW:30,laterals:4,highIn:18,dropIn:8,fieldType:'gravity',
+   photos:[],docs:[],partial:[]},
+];
+
+var MAP_LAYERS = [
+  {label:'Well location',color:'#60A5FA',inst:'Walk to well, drop point',pts:[],single:true},
+  {label:'House corners',color:'#A78BFA',inst:'Walk each corner, drop point',pts:[],single:false},
+  {label:'Driveway',color:'#F59E0B',inst:'Walk driveway edge, drop points',pts:[],single:false},
+  {label:'Property lines',color:'#34D399',inst:'Walk property boundary',pts:[],single:false},
+  {label:'Tank corners',color:'#FB923C',inst:'Walk each tank corner',pts:[],single:false},
+  {label:'Inlet line',color:'#F472B6',inst:'Walk house to tank',pts:[],single:false},
+  {label:'Field corners',color:'#4ADE80',inst:'Walk each field corner',pts:[],single:false},
+  {label:'Effluent/force main',color:'#38BDF8',inst:'Walk tank to field',pts:[],single:false},
+  {label:'Risers',color:'#E879F9',inst:'Walk to each riser, drop point',pts:[],single:false},
+];
+
+// ── LOCAL STORAGE ────────────────────────────────────────
+function saveData(){
+  try{
+    localStorage.setItem('sp_custs',JSON.stringify(CUSTOMERS));
+    localStorage.setItem('sp_layers',JSON.stringify(MAP_LAYERS.map(function(l){return l.pts;})));
+  }catch(e){console.warn('save failed',e);}
+}
+function loadData(){
+  try{
+    var c=localStorage.getItem('sp_custs');
+    if(c){var p=JSON.parse(c);if(p&&p.length){CUSTOMERS.length=0;p.forEach(function(x){CUSTOMERS.push(x);});}}
+    var l=localStorage.getItem('sp_layers');
+    if(l){var pts=JSON.parse(l);pts.forEach(function(p,i){if(MAP_LAYERS[i])MAP_LAYERS[i].pts=p;});}
+  }catch(e){console.warn('load failed',e);}
+}
+
+// ── LOGIN ────────────────────────────────────────────────
+function setRole(r){
+  selRole=r;
+  g('rbAdmin').className='rb'+(r==='admin'?' on':'');
+  g('rbEmp').className='rb'+(r==='employee'?' on':'');
+}
+function doLogin(){
+  var pw=(g('pwInput').value||'').trim();
+  if(pw==='admin123'||pw==='crew123'){
+    ROLE=pw==='crew123'?'employee':'admin';
+    loadData();
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+    g('nav').style.display='flex';
+    g('scrDash').classList.add('active');
+    renderDash();
+  } else {
+    g('loginErr').textContent='Wrong password — try admin123';
+    setTimeout(function(){g('loginErr').textContent='';},3000);
+  }
+}
+
+// ── NAVIGATION ───────────────────────────────────────────
+function go(name){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  var el=g('scr'+name);
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});
+  var ni=g('ni-'+name.toLowerCase());
+  if(ni)ni.classList.add('on');
+  if(name==='Custs')renderCusts();
+  if(name==='Jobs')renderJobs();
+  if(name==='Dash')renderDash();
+}
+
+// ── SLIDES ───────────────────────────────────────────────
+function openSlide(id){g(id).classList.add('open');g('overlay').classList.add('open');}
+function closeSlide(id){g(id).classList.remove('open');}
+function closeAllSlides(){
+  document.querySelectorAll('.slide').forEach(function(s){s.classList.remove('open');});
+  g('overlay').classList.remove('open');
+}
+
+// ── DASHBOARD ────────────────────────────────────────────
+function renderDash(){
+  var h=new Date().getHours();
+  if(g('greeting'))g('greeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Phil';
+  var comp=CUSTOMERS.filter(function(c){return c.status==='completed';}).length;
+  var sched=CUSTOMERS.filter(function(c){return c.status==='scheduled';}).length;
+  var part=CUSTOMERS.filter(function(c){return c.status==='partial';}).length;
+  if(g('mComp'))g('mComp').textContent=comp;
+  if(g('mSched'))g('mSched').textContent=sched;
+  if(g('mPart'))g('mPart').textContent=part;
+  if(g('mTotal'))g('mTotal').textContent=CUSTOMERS.length;
+  var upcoming=CUSTOMERS.filter(function(c){return c.status==='scheduled'&&c.date;}).sort(function(a,b){return a.date>b.date?1:-1;}).slice(0,3);
+  if(g('dashJobs')){
+    if(!upcoming.length){g('dashJobs').innerHTML='<div style="padding:16px;color:var(--text3);text-align:center;">No upcoming jobs scheduled</div>';return;}
+    g('dashJobs').innerHTML=upcoming.map(function(c){
+      return '<div class="lr" onclick="openProf(\''+c.id+'\')">'+
+        '<div class="av">'+c.fn[0]+c.ln[0]+'</div>'+
+        '<div class="ri"><div class="rn">'+c.fn+' '+c.ln+'</div><div class="rs">'+fmtD(c.date)+(c.dur?' · '+c.dur+'d':'')+'</div></div>'+
+        statusBadge(c.status)+'</div>';
+    }).join('');
+  }
+}
+
+// ── CUSTOMERS ────────────────────────────────────────────
+function statusBadge(s){
+  var map={completed:'b-green',scheduled:'b-blue',partial:'b-amber',none:'b-gray'};
+  var lbl={completed:'Completed',scheduled:'Scheduled',partial:'In progress',none:'Unscheduled'};
+  return '<span class="badge '+(map[s]||'b-gray')+'">'+(lbl[s]||s)+'</span>';
+}
+function renderCusts(){
+  if(!g('custList'))return;
+  if(!CUSTOMERS.length){g('custList').innerHTML='<div style="padding:32px;text-align:center;color:var(--text3);">No customers yet — tap + New</div>';return;}
+  g('custList').innerHTML=CUSTOMERS.map(function(c){
+    return '<div class="lr" onclick="openProf(\''+c.id+'\')">'+
+      '<div class="av" style="background:'+(c.status==='completed'?'var(--green)':c.status==='partial'?'var(--amber)':'var(--blue)')+';">'+c.fn[0]+c.ln[0]+'</div>'+
+      '<div class="ri"><div class="rn">'+c.fn+' '+c.ln+'</div><div class="rs">'+(c.city||'')+(c.date?' · '+fmtD(c.date):'')+'</div></div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'+
+      statusBadge(c.status)+
+      '<div class="del-btn" onclick="event.stopPropagation();deleteCust(\''+c.id+'\')">Delete</div>'+
+      '</div></div>';
+  }).join('');
+}
+
+function openProf(id){
+  CUST=CUSTOMERS.find(function(c){return c.id===id;});
+  if(!CUST)return;
+  g('profName').textContent=CUST.fn+' '+CUST.ln;
+  g('profSub').textContent=(CUST.city||'')+(CUST.state?', '+CUST.state:'');
+  g('profDelBtn').onclick=function(){deleteCust(CUST.id);};
+  var tabs=['Info','Estimate','As-Built','Docs','Schedule'];
+  g('profTabs').innerHTML=tabs.map(function(t,i){
+    return '<div class="pt'+(i===0?' on':'')+'" onclick="renderProfTab(\''+t.toLowerCase().replace('-','')+'\')">'+(t==='As-Built'?'As-Built':t)+'</div>';
+  }).join('');
+  renderProfTab('info');
+  go('Profile');
+}
+
+function renderProfTab(tab){
+  // Update tab highlight
+  var tabMap={info:0,estimate:1,asbuilt:2,docs:3,schedule:4};
+  document.querySelectorAll('.pt').forEach(function(t,i){t.classList.toggle('on',i===tabMap[tab]);});
+  var c=CUST; var html='';
+  if(tab==='info'){
+    html='<div class="dt">'+
+      '<div class="dr"><span class="dk">Phone</span><span class="dv">'+c.ph+'</span></div>'+
+      '<div class="dr"><span class="dk">Address</span><span class="dv">'+(c.addr||'—')+(c.city?', '+c.city:'')+'</span></div>'+
+      '<div class="dr"><span class="dk">Status</span><span class="dv">'+statusBadge(c.status)+'</span></div>'+
+      '<div class="dr"><span class="dk">Date</span><span class="dv">'+(c.date?fmtD(c.date):'Not scheduled')+'</span></div>'+
+      '<div class="dr"><span class="dk">Field</span><span class="dv">'+(c.fL&&c.fW?c.fL+"' × "+c.fW+"'":'Not set')+'</span></div>'+
+      '<div class="dr"><span class="dk">Notes</span><span class="dv">'+(c.notes||'—')+'</span></div>'+
+      '</div>'+
+      '<div class="btn-row">'+
+      '<div class="btn btn-b" style="flex:1;" onclick="prefillEst()">Open in estimator</div>'+
+      '<div class="btn btn-g" onclick="SCHED_CUST=CUST;openSlide(\'slideSchedule\')">Schedule</div>'+
+      '</div>'+
+      '<div class="sl">Set status</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+      ['none','scheduled','partial','completed'].map(function(s){
+        return '<div class="btn '+(c.status===s?'btn-b':'btn-g')+'" onclick="setCustStatus(\''+s+'\')" style="font-size:12px;padding:8px 12px;">'+({none:'Unscheduled',scheduled:'Scheduled',partial:'In progress',completed:'Completed'}[s])+'</div>';
+      }).join('')+'</div>';
+  } else if(tab==='estimate'){
+    if(c.lastEst){
+      html='<div class="sl">Saved estimate</div>'+
+        c.lastEst.lines.map(function(l){return '<div class="ql"><div><div class="ql-l">'+l.label+'</div><div class="ql-d">'+l.desc+'</div></div><div class="ql-p">'+fmt$(l.price)+'</div></div>';}).join('')+
+        '<div class="tc"><span class="tc-l">Total project price</span><span class="tc-v">'+fmt$(c.lastEst.total)+'</span></div>'+
+        '<div class="btn-row"><div class="btn btn-b" onclick="prefillEst()">Edit estimate</div>'+
+        '<div class="btn btn-r" onclick="deleteEst()">Delete estimate</div></div>';
+    } else {
+      html='<div style="padding:32px;text-align:center;color:var(--text3);">No estimate saved yet</div>'+
+        '<div class="btn btn-b" style="width:100%;" onclick="prefillEst()">Create estimate</div>';
+    }
+  } else if(tab==='asbuilt'){
+    var xsec='';
+    if(c.fL&&c.highIn!==undefined){
+      var hFt=c.highIn/12,dFt=(c.dropIn||0)/12,lFt=hFt+dFt;
+      var stFt=hFt+1,sR=4,tFt=0.5;
+      var sHH=stFt,sHL=stFt+dFt,sRH=sR*sHH,sRL=sR*sHL;
+      var extH=Math.max(5,sRH),extL=Math.max(5,sRL);
+      var totL=c.fL+extH+extL;
+      var maxH=stFt+tFt+0.5;
+      var W=320,H=140,pL=42,pR=42,pB=36,pT=16;
+      var dW=W-pL-pR,dH=H-pT-pB;
+      function px(f){return pL+(f/totL)*dW;}
+      function py(f){return H-pB-(f/maxH)*dH;}
+      var xFL=px(extH),xFR=px(extH+c.fL);
+      var xSL=px(extH-sRH),xSR=px(extH+c.fL+sRL);
+      var yGH=py(0),yGL=py(-dFt);
+      var yST=py(hFt),yStoT=py(hFt+1),yTT=py(hFt+1+tFt);
+      var sm=Math.sqrt(1+sR*sR),tNV=tFt/sm*dH/maxH,tNH=tFt*sR/sm*dW/totL;
+      var tSLx=xSL-tNH,tSLy=yGH-tNV,tSRx=xSR+tNH,tSRy=yGL-tNV;
+      var bY=H-pB;
+      var sv='';
+      sv+='<polygon points="'+pL+','+yGH+' '+(W-pR)+','+yGL+' '+(W-pR)+','+bY+' '+pL+','+bY+'" fill="#C0DD97" opacity="0.3"/>';
+      sv+='<line x1="'+pL+'" y1="'+yGH+'" x2="'+(W-pR)+'" y2="'+yGL+'" stroke="#3B6D11" stroke-width="1" stroke-dasharray="4,2"/>';
+      sv+='<polygon points="'+xFL+','+yST+' '+xFR+','+yST+' '+xFR+','+yGL+' '+xFL+','+yGH+'" fill="#FAC775" opacity="0.8"/>';
+      sv+='<polygon points="'+xSL+','+yGH+' '+xFL+','+yStoT+' '+xFL+','+yGH+'" fill="#FAC775" opacity="0.8"/>';
+      sv+='<polygon points="'+xFR+','+yStoT+' '+xSR+','+yGL+' '+xFR+','+yGL+'" fill="#FAC775" opacity="0.8"/>';
+      sv+='<rect x="'+xFL+'" y="'+yStoT+'" width="'+(xFR-xFL)+'" height="'+(yST-yStoT)+'" fill="#B5D4F4" opacity="0.85"/>';
+      sv+='<line x1="'+xFL+'" y1="'+yStoT+'" x2="'+xFR+'" y2="'+yStoT+'" stroke="#185FA5" stroke-width="1.5"/>';
+      sv+='<polygon points="'+tSLx+','+tSLy+' '+xFL+','+yTT+' '+xFR+','+yTT+' '+tSRx+','+tSRy+' '+xSR+','+yGL+' '+xFR+','+yStoT+' '+xFL+','+yStoT+' '+xSL+','+yGH+'" fill="#9FE1CB" opacity="0.8"/>';
+      sv+='<polyline points="'+tSLx+','+tSLy+' '+xFL+','+yTT+' '+xFR+','+yTT+' '+tSRx+','+tSRy+'" fill="none" stroke="#1D9E75" stroke-width="2"/>';
+      sv+='<line x1="'+xSL+'" y1="'+yGH+'" x2="'+xFL+'" y2="'+yStoT+'" stroke="#BA7517" stroke-width="1.2"/>';
+      sv+='<line x1="'+xFR+'" y1="'+yStoT+'" x2="'+xSR+'" y2="'+yGL+'" stroke="#BA7517" stroke-width="1.2"/>';
+      sv+='<text x="'+(xFL+xFR)/2+'" y="'+(yST+(yGH-yST)*0.45)+'" font-size="9" fill="#854F0B" text-anchor="middle" font-family="sans-serif">sand</text>';
+      sv+='<text x="'+(xFL+xFR)/2+'" y="'+(yStoT+(yST-yStoT)/2+3)+'" font-size="9" fill="#0C447C" text-anchor="middle" font-family="sans-serif">stone 12"</text>';
+      sv+='<text x="'+(xFL+xFR)/2+'" y="'+(yTT+(yStoT-yTT)/2+3)+'" font-size="9" fill="#085041" text-anchor="middle" font-family="sans-serif">topsoil</text>';
+      var aLx=pL-8;
+      sv+='<line x1="'+aLx+'" y1="'+yGH+'" x2="'+aLx+'" y2="'+yST+'" stroke="#BA7517" stroke-width="0.8"/>';
+      sv+='<text x="'+(aLx-3)+'" y="'+(yGH+(yST-yGH)/2+3)+'" font-size="8" fill="#854F0B" text-anchor="end" font-family="sans-serif">'+c.highIn+'"</text>';
+      sv+='<text x="'+(xFL+xFR)/2+'" y="'+(bY+12)+'" font-size="8" fill="#64748B" text-anchor="middle" font-family="sans-serif">'+c.fL+"' × "+c.fW+"' field</text>";
+      xsec='<div class="card" style="margin-bottom:12px;">'+
+        '<div class="card-title">Cross-section — '+c.fL+"' × "+c.fW+"'"+(c.highIn?' · '+c.highIn+'" fill':'')+'</div>'+
+        '<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">'+sv+'</svg>'+
+        '<div style="display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;">'+
+        '<span style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:8px;background:#FAC775;border-radius:1px;display:inline-block;"></span>Sand</span>'+
+        '<span style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:8px;background:#B5D4F4;border-radius:1px;display:inline-block;"></span>Stone</span>'+
+        '<span style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:8px;background:#9FE1CB;border-radius:1px;display:inline-block;"></span>Topsoil</span>'+
+        '</div></div>';
+    }
+    html=xsec+
+      '<div class="sb-box"><div class="sb-title">⚠ Required setbacks</div>'+
+      '<div class="sb-grid">'+
+      '<div class="sb-item"><div class="sb-num">10\'</div><div class="sb-lbl">Property line</div></div>'+
+      '<div class="sb-item"><div class="sb-num">50\'</div><div class="sb-lbl">Any well</div></div>'+
+      '<div class="sb-item"><div class="sb-num">75\'</div><div class="sb-lbl">Water/lake</div></div>'+
+      '<div class="sb-item"><div class="sb-num">10\'</div><div class="sb-lbl">Foundation</div></div>'+
+      '</div></div>'+
+      '<div class="sl">GPS capture checklist</div>'+
+      '<div class="dt">'+
+      MAP_LAYERS.map(function(l,i){
+        var done=l.pts.length>0;
+        return '<div class="dr" onclick="go(\'Map\');initMap();activeCap='+i+';updateCapUI();" style="cursor:pointer;">'+
+          '<div style="width:10px;height:10px;border-radius:50%;background:'+l.color+';flex-shrink:0;"></div>'+
+          '<div class="ri"><div class="rn" style="font-size:13px;">'+l.label+'</div>'+
+          '<div class="rs">'+(done?l.pts.length+' point'+(l.pts.length!==1?'s':'')+' captured':l.inst)+'</div></div>'+
+          '<div style="font-size:13px;font-weight:700;color:'+(done?'var(--green)':'var(--text3)')+';">'+(done?'✓':'Tap')+'</div></div>';
+      }).join('')+'</div>'+
+      '<div class="btn-row">'+
+      '<div class="btn btn-b" style="flex:1;" onclick="go(\'Map\');initMap();">Open GPS map</div>'+
+      '</div>';
+  } else if(tab==='docs'){
+    var photos=c.photos||[];
+    html='<div class="sl">Job photos</div>'+
+      '<div class="photo-grid">'+
+      photos.map(function(p,i){
+        return '<div class="photo-thumb"><img src="'+p.src+'"><div class="ph-del" onclick="deletePhoto(\''+c.id+'\','+i+')">×</div></div>';
+      }).join('')+
+      '<label class="photo-add" title="Camera"><input type="file" accept="image/*" capture="environment" style="display:none;" multiple onchange="addPhoto(this,\''+c.id+'\')"><div class="photo-add-icon">📷</div><div class="photo-add-lbl">Camera</div></label>'+
+      '<label class="photo-add" title="Library"><input type="file" accept="image/*" style="display:none;" multiple onchange="addPhoto(this,\''+c.id+'\')"><div class="photo-add-icon">🖼</div><div class="photo-add-lbl">Library</div></label>'+
+      '</div>'+
+      '<div class="sl">Documents</div>'+
+      (c.docs&&c.docs.length?
+        c.docs.map(function(d){return '<div class="card" style="display:flex;align-items:center;gap:10px;"><div style="font-size:20px;">📄</div><div style="flex:1;font-size:13px;font-weight:600;">'+d+'</div></div>';}).join(''):
+        '<div style="padding:16px 0;color:var(--text3);font-size:13px;">No documents yet</div>');
+  } else if(tab==='schedule'){
+    html='<div class="dt">'+
+      '<div class="dr"><span class="dk">Date</span><span class="dv">'+(c.date?fmtD(c.date):'Not scheduled')+'</span></div>'+
+      '<div class="dr"><span class="dk">Duration</span><span class="dv">'+(c.dur?c.dur+' day'+(c.dur!==1?'s':''):'—')+'</span></div>'+
+      '<div class="dr"><span class="dk">Notes</span><span class="dv">'+(c.notes||'—')+'</span></div>'+
+      '</div>'+
+      '<div class="btn btn-b" style="width:100%;margin-top:8px;" onclick="SCHED_CUST=CUST;openSlide(\'slideSchedule\')">Change schedule</div>';
+  }
+  g('profContent').innerHTML=html;
+}
+
+function saveNewCust(){
+  var first=(g('nFirst').value||'').trim();
+  var last=(g('nLast').value||'').trim();
+  if(!first||!last){toast('Enter first and last name');return;}
+  CUSTOMERS.push({
+    id:'c'+Date.now(),fn:first,ln:last,co:'',
+    ph:g('nPhone').value||'',addr:g('nAddr').value||'',
+    city:g('nCity').value||'',state:g('nState').value||'MI',
+    status:'none',date:'',dur:1,notes:'',
+    photos:[],docs:[],partial:[],
+    fL:40,fW:30,laterals:4,highIn:24,dropIn:0,fieldType:'gravity'
+  });
+  g('nFirst').value='';g('nLast').value='';g('nPhone').value='';g('nAddr').value='';g('nCity').value='';
+  closeSlide('slideNewCust');
+  saveData();
+  renderCusts();
+  toast(first+' '+last+' added');
+}
+
+function deleteCust(id){
+  var c=CUSTOMERS.find(function(x){return x.id===id;});
+  if(!c)return;
+  if(!confirm('Delete '+c.fn+' '+c.ln+'?'))return;
+  CUSTOMERS=CUSTOMERS.filter(function(x){return x.id!==id;});
+  if(CUST&&CUST.id===id){CUST=null;}
+  saveData();
+  go('Custs');
+  toast('Customer deleted');
+}
+
+function setCustStatus(s){
+  if(!CUST)return;
+  CUST.status=s;
+  saveData();
+  renderProfTab('info');
+  toast('Status updated');
+}
+
+function prefillEst(){
+  if(!CUST)return;
+  if(CUST.fL)g('eFl').value=CUST.fL;
+  if(CUST.fW)g('eFw').value=CUST.fW;
+  if(CUST.laterals)g('eLat').value=CUST.laterals;
+  if(CUST.highIn)g('eHigh').value=CUST.highIn;
+  if(CUST.dropIn!==undefined)g('eDrop').value=CUST.dropIn;
+  if(CUST.fieldType)g('eType').value=CUST.fieldType;
+  go('Est');
+}
+
+// ── JOBS ─────────────────────────────────────────────────
+function renderJobs(){
+  if(!g('jobsList'))return;
+  var sorted=CUSTOMERS.slice().sort(function(a,b){
+    var order={partial:0,scheduled:1,none:2,completed:3};
+    return (order[a.status]||2)-(order[b.status]||2);
+  });
+  g('jobsList').innerHTML=sorted.map(function(c){
+    return '<div class="lr" onclick="openProf(\''+c.id+'\')">'+
+      '<div class="av" style="background:'+(c.status==='completed'?'var(--green)':c.status==='partial'?'var(--amber)':'var(--blue)')+';">'+c.fn[0]+c.ln[0]+'</div>'+
+      '<div class="ri"><div class="rn">'+c.fn+' '+c.ln+'</div>'+
+      '<div class="rs">'+(c.date?fmtD(c.date):'No date')+(c.dur?' · '+c.dur+'d':'')+'</div></div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'+
+      statusBadge(c.status)+
+      '<select onclick="event.stopPropagation()" onchange="changeJobSt(\''+c.id+'\',this.value)" style="font-size:11px;padding:3px 5px;background:var(--bg3);border:.5px solid var(--border2);border-radius:var(--rs);color:var(--text);">'+
+      ['none','scheduled','partial','completed'].map(function(s){return '<option value="'+s+'"'+(c.status===s?' selected':'')+'>'+({none:'Unscheduled',scheduled:'Scheduled',partial:'In progress',completed:'Completed'}[s])+'</option>';}).join('')+
+      '</select>'+
+      '<div class="del-btn" onclick="event.stopPropagation();deleteCust(\''+c.id+'\')">Delete</div>'+
+      '</div></div>';
+  }).join('');
+}
+
+function changeJobSt(id,status){
+  var c=CUSTOMERS.find(function(x){return x.id===id;});
+  if(c){c.status=status;saveData();renderJobs();toast('Status updated');}
+}
+
+// ── SCHEDULE ─────────────────────────────────────────────
+function saveSchedule(){
+  var c=SCHED_CUST||CUST;
+  if(!c)return;
+  var date=g('sDate').value;
+  var dur=parseFloat(g('sDur').value)||1;
+  var notes=g('sNotes').value||'';
+  if(!date){toast('Pick a date');return;}
+  c.date=date;c.dur=dur;if(notes)c.notes=notes;
+  c.status='scheduled';
+  closeSlide('slideSchedule');
+  saveData();
+  renderJobs();
+  toast('Scheduled '+fmtD(date));
+}
+
+// ── ESTIMATOR ────────────────────────────────────────────
+function syncSlope(){
+  g('eSlope').value=g('eType').value==='pressure'?'3':'4';
+}
+
+function calcEst(){
+  var fL=+g('eFl').value||40;
+  var fW=+g('eFw').value||30;
+  var laterals=+g('eLat').value||4;
+  var ext=+g('eExt').value||5;
+  var highIn=+g('eHigh').value||24;
+  var dropIn=+g('eDrop').value||0;
+  var slopeR=+g('eSlope').value||4;
+  var topIn=+g('eTopSlider').value||6;
+  var ft=g('eType').value;
+  var truckCap=+g('eTruckCY').value||15;
+  var truckRT=+g('eTruckRT').value||1;
+  var truckRate=+g('eTruckRate').value||100;
+  var jobDays=+g('eJobDays').value||2;
+  var margin=+g('eMargin').value||0.20;
+
+  var isPressure=ft==='pressure';
+  var isGravity=ft==='gravity';
+  var hasStone=isGravity||isPressure;
+
+  // Geometry
+  var hFt=highIn/12,dFt=dropIn/12,lFt=hFt+dFt;
+  var stoneFt=1,tFt=topIn/12;
+  var sHH=hFt+stoneFt,sHL=sHH+dFt;
+  var sRH=slopeR*sHH,sRL=slopeR*sHL;
+  var extH=Math.max(ext,sRH),extL=Math.max(ext,sRL),extS=Math.max(ext,slopeR*sHH);
+  var totalL=fL+extH+extL,totalW=fW+extS*2;
+
+  // Sand volumes
+  var sandBed=(hFt+lFt)/2*fW*fL;
+  var sandHigh=0.5*sHH*sRH*fW;
+  var sandLow=0.5*sHL*sRL*fW;
+  var avgH=(sHH+sHL)/2,avgR=slopeR*avgH;
+  var sandSides=2*(0.5*avgH*avgR*fL);
+  var sandCY=cy(sandBed+sandHigh+sandLow+sandSides);
+
+  var stoneCY=hasStone?cy(fL*fW*stoneFt):0;
+  var fabricSqFt=fL*fW,fabricSqYd=rd(fabricSqFt/9,1);
+  var topsoilCY=cy(totalL*totalW*tFt);
+
+  // Pipe & fittings
+  var headerFt=fW,footerFt=isPressure?0:fW,solidFt=headerFt+footerFt;
+  var perfFt=laterals*fL;
+  var elbows=4,tees=(laterals-2)*2+1;
+  var sweep90s=isGravity?0:laterals,caps=isGravity?0:laterals;
+  var obsBoxes=isPressure?laterals:0;
+  var cleanouts=1;
+
+  // Pricing
+  var pSand=+g('ePSand').value||28;
+  var pStone=+g('ePStone').value||45;
+  var pTop=+g('ePTop').value||32;
+  var pFab=+g('ePFab').value||1.50;
+  var pSolid=+g('ePSolid').value||1.20;
+  var pPerf=+g('ePPerf').value||1.20;
+  var pElbow=+g('ePElbow').value||4.50;
+  var pTee=+g('ePTee').value||5.00;
+  var pSweep=+g('ePSweep').value||8.00;
+  var pCap=+g('ePCap').value||3.00;
+  var pObs=+g('ePObs').value||45.00;
+  var pClean=+g('ePClean').value||35.00;
+
+  var cSand=sandCY*pSand,cStone=stoneCY*pStone,cTop=topsoilCY*pTop,cFab=fabricSqYd*pFab;
+  var cSolid=solidFt*pSolid,cPerf=perfFt*pPerf;
+  var cElbow=elbows*pElbow,cTee=tees*pTee,cSweep=sweep90s*pSweep,cCap=caps*pCap;
+  var cObs=obsBoxes*pObs,cClean=cleanouts*pClean;
+
+  // Trucks
+  var sandTrucks=Math.ceil(sandCY/truckCap);
+  var stoneTrucks=hasStone?Math.ceil(stoneCY/truckCap):0;
+  var topTrucks=Math.ceil(topsoilCY/truckCap);
+  var totalTrucks=sandTrucks+stoneTrucks+topTrucks;
+  var truckCost=rd(totalTrucks*truckRT*truckRate,2);
+
+  // Overhead from Site Right model
+  var totalOh=rd((2049.49+800+520+65)*jobDays,2);
+
+  var matCost=cSand+cStone+cTop+cFab+cSolid+cPerf+cElbow+cTee+cSweep+cCap+cObs+cClean+truckCost;
+  var totalCost=rd(matCost+totalOh,2);
+  var quotePrice=margin>0?rd(totalCost/(1-margin),2):totalCost;
+
+  // Build output
+  var intHTML='<div class="sl">Materials to order</div><div class="dt">';
+  intHTML+='<div class="dr"><span class="dk">Sand</span><span class="dv">'+sandCY+' CY</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Stone (12" bed)</span><span class="dv">'+(hasStone?stoneCY+' CY':'Not needed')+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Topsoil ('+topIn+'" cover)</span><span class="dv">'+topsoilCY+' CY</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Filter fabric (bed only)</span><span class="dv">'+fabricSqYd+' sq yd ('+fabricSqFt+' sq ft)</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Solid pipe (header'+(isPressure?'':'+footer')+')</span><span class="dv">'+solidFt+' ft</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Perforated pipe ('+laterals+' laterals)</span><span class="dv">'+perfFt+' ft</span></div>';
+  intHTML+='<div class="dr"><span class="dk">90° elbows (4 corners)</span><span class="dv">4</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Tees [(lat-2)×2+1]</span><span class="dv">'+tees+'</span></div>';
+  if(!isGravity){
+    intHTML+='<div class="dr"><span class="dk">Sweep 90s (1/lateral)</span><span class="dv">'+sweep90s+'</span></div>';
+    intHTML+='<div class="dr"><span class="dk">Threaded caps (1/lateral)</span><span class="dv">'+caps+'</span></div>';
+  }
+  if(isPressure&&obsBoxes>0)intHTML+='<div class="dr"><span class="dk">Observation boxes (1/lateral)</span><span class="dv">'+obsBoxes+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Cleanout</span><span class="dv">1</span></div>';
+  intHTML+='</div>';
+  intHTML+='<div class="sl">Cost breakdown</div><div class="dt">';
+  intHTML+='<div class="dr"><span class="dk">Sand '+sandCY+' CY × '+fmt$(pSand)+'/CY</span><span class="dv" style="color:var(--green);">'+fmt$(cSand)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Stone '+stoneCY+' CY × '+fmt$(pStone)+'/CY</span><span class="dv" style="color:var(--green);">'+fmt$(cStone)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Topsoil '+topsoilCY+' CY × '+fmt$(pTop)+'/CY</span><span class="dv" style="color:var(--green);">'+fmt$(cTop)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Fabric '+fabricSqYd+' sq yd</span><span class="dv" style="color:var(--green);">'+fmt$(cFab)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Pipe '+(solidFt+perfFt)+' ft total</span><span class="dv" style="color:var(--green);">'+fmt$(cSolid+cPerf)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Fittings (elbows+tees+misc)</span><span class="dv" style="color:var(--green);">'+fmt$(cElbow+cTee+cSweep+cCap+cObs+cClean)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Trucks '+totalTrucks+' loads × '+truckRT+'h × '+fmt$(truckRate)+'/hr</span><span class="dv" style="color:var(--green);">'+fmt$(truckCost)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Overhead '+jobDays+'d ('+jobDays*8+' hrs)</span><span class="dv" style="color:var(--green);">'+fmt$(totalOh)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk" style="font-weight:700;">Your cost</span><span class="dv">'+fmt$(totalCost)+'</span></div>';
+  intHTML+='<div class="dr"><span class="dk">Margin ('+Math.round(margin*100)+'%)</span><span class="dv" style="color:var(--green);font-weight:700;">'+fmt$(quotePrice-totalCost)+'</span></div>';
+  intHTML+='</div>';
+
+  var custLines=[
+    {label:'Septic system installation',desc:fL+"' × "+fW+"' field · "+laterals+' laterals · '+(ft.charAt(0).toUpperCase()+ft.slice(1)),price:quotePrice}
+  ];
+  var custHTML=custLines.map(function(l){return '<div class="ql"><div><div class="ql-l">'+l.label+'</div><div class="ql-d">'+l.desc+'</div></div><div class="ql-p">'+fmt$(l.price)+'</div></div>';}).join('');
+
+  g('estOut').innerHTML=
+    '<div class="est-tabs"><div class="et on" id="etInt" onclick="showET(\'int\')">Internal</div><div class="et" id="etCust" onclick="showET(\'cust\')">Customer quote</div></div>'+
+    '<div id="etIntDiv">'+intHTML+'</div>'+
+    '<div id="etCustDiv" style="display:none;">'+
+      '<div class="card">'+custHTML+'</div>'+
+    '</div>'+
+    '<div class="tc"><span class="tc-l">Quote price</span><span class="tc-v">'+fmt$(quotePrice)+'</span></div>'+
+    '<div class="btn-row">'+
+    '<div class="btn btn-b" style="flex:1;" onclick="saveEstToCust('+JSON.stringify(custLines).replace(/"/g,"'")+','+quotePrice+')">Save to customer</div>'+
+    '<div class="btn btn-r" onclick="deleteEst()">Delete</div>'+
+    '</div>';
+}
+
+function showET(v){
+  g('etInt').className='et'+(v==='int'?' on':'');
+  g('etCust').className='et'+(v==='cust'?' on':'');
+  g('etIntDiv').style.display=v==='int'?'block':'none';
+  g('etCustDiv').style.display=v==='cust'?'block':'none';
+}
+
+function saveEstToCust(lines,total){
+  if(CUST){CUST.lastEst={lines:lines,total:total};saveData();toast('Saved to '+CUST.fn+"'s record");}
+  else toast('Open a customer first');
+}
+
+function deleteEst(){
+  if(!CUST)return;
+  if(!confirm('Delete estimate?'))return;
+  CUST.lastEst=null;
+  saveData();
+  renderProfTab('estimate');
+  toast('Estimate deleted');
+}
+
+// ── PHOTOS ───────────────────────────────────────────────
+function addPhoto(input,custId){
+  var c=CUSTOMERS.find(function(x){return x.id===custId;});
+  if(!c)return;
+  if(!c.photos)c.photos=[];
+  var files=Array.from(input.files);
+  if(!files.length)return;
+  var loaded=0;
+  files.forEach(function(file){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      c.photos.push({src:e.target.result,name:file.name});
+      loaded++;
+      if(loaded===files.length){saveData();toast(loaded+' photo'+(loaded>1?'s':'')+' added');renderProfTab('docs');}
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+
+function deletePhoto(custId,idx){
+  var c=CUSTOMERS.find(function(x){return x.id===custId;});
+  if(!c||!c.photos)return;
+  if(!confirm('Delete this photo?'))return;
+  c.photos.splice(idx,1);
+  saveData();
+  renderProfTab('docs');
+  toast('Photo deleted');
+}
+
+// ── MAP ──────────────────────────────────────────────────
+function initMap(){
+  if(leafMap)return;
+  leafMap=L.map('leafMap',{zoomControl:true,attributionControl:false}).setView([47.2,-88.5],14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20}).addTo(leafMap);
+  renderMapLayers();
+  updateCapUI();
+  // Live GPS
+  if(navigator.geolocation){
+    navigator.geolocation.watchPosition(
+      function(pos){
+        var lat=pos.coords.latitude,lng=pos.coords.longitude;
+        if(!liveMarker)leafMap.setView([lat,lng],18);
+        if(liveMarker)leafMap.removeLayer(liveMarker);
+        liveMarker=L.circleMarker([lat,lng],{radius:9,fillColor:'#3B82F6',color:'#fff',weight:3,fillOpacity:1})
+          .bindTooltip('You are here',{permanent:false}).addTo(leafMap);
+      },
+      function(){},
+      {enableHighAccuracy:true,timeout:10000,maximumAge:5000}
+    );
+  }
+}
+
+function renderMapLayers(){
+  if(!leafMap)return;
+  MAP_LAYERS.forEach(function(l){
+    l.pts.forEach(function(pt){
+      L.circleMarker([pt.lat,pt.lng],{radius:6,fillColor:l.color,color:'#fff',weight:2,fillOpacity:1})
+        .bindTooltip(l.label,{permanent:false}).addTo(leafMap);
+    });
+  });
+  var html='';
+  MAP_LAYERS.forEach(function(l,i){
+    html+='<div class="ml-row" onclick="activeCap='+i+';updateCapUI();">'+
+      '<div class="ml-dot" style="background:'+l.color+';"></div>'+
+      '<div style="flex:1;color:'+(l.pts.length?'var(--text)':'var(--text2)')+';">'+l.label+'</div>'+
+      '<div style="font-size:10px;color:'+(l.pts.length?'var(--green)':'var(--text3)')+';">'+(l.pts.length?'✓'+l.pts.length:'')+'</div>'+
+      '</div>';
+  });
+  g('mapLayers').innerHTML=html;
+}
+
+function updateCapUI(){
+  var l=MAP_LAYERS[activeCap];
+  if(g('capTitle'))g('capTitle').textContent=l.label;
+  if(g('capSub'))g('capSub').textContent=l.inst;
+}
+
+function dropPt(){
+  if(!leafMap){toast('Map not loaded');return;}
+  if(!navigator.geolocation){dropAtCenter();return;}
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var pt={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      var acc=Math.round(pos.coords.accuracy);
+      placePoint(pt,acc);
+    },
+    function(){dropAtCenter();},
+    {enableHighAccuracy:true,timeout:8000,maximumAge:0}
+  );
+}
+
+function dropAtCenter(){
+  var ctr=leafMap.getCenter();
+  placePoint({lat:ctr.lat,lng:ctr.lng},999);
+}
+
+function placePoint(pt,accuracy){
+  var l=MAP_LAYERS[activeCap];
+  l.pts.push(pt);
+  L.circleMarker([pt.lat,pt.lng],{radius:6,fillColor:l.color,color:'#fff',weight:2,fillOpacity:1})
+    .bindTooltip(l.label+' '+(l.pts.length),{permanent:false}).addTo(leafMap);
+  renderMapLayers();
+  saveData();
+  toast('Point saved — '+l.label+(accuracy<50?' (±'+accuracy+'m)':''));
+}
+
+// ── SERVICE WORKER ───────────────────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>
