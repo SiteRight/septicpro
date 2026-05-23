@@ -622,10 +622,10 @@ function openProf(id){
   g('profSub').textContent=(CUST.city||'')+(CUST.state?', '+CUST.state:'');
   g('profDelBtn').onclick=function(){deleteCust(CUST.id);};
   var tabs=['Info','Estimate','As-Built','Docs','Schedule'];
-  g('profTabs').innerHTML=tabs.map(function(t,i){
-    return '<div class="pt'+(i===0?' on':'')+'" onclick="renderProfTab(\''+t.toLowerCase().replace('-','')+'\')">'+(t==='As-Built'?'As-Built':t)+'</div>';
+  g('profTabs').innerHTML=tabs.map(function(t){
+    return '<div class="pt" onclick="renderProfTab(\''+t.toLowerCase().replace('-','')+'\')">'+(t==='As-Built'?'As-Built':t)+'</div>';
   }).join('');
-  renderProfTab('info');
+  g('profContent').innerHTML='';
   go('Profile');
 }
 
